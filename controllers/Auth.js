@@ -1,6 +1,5 @@
 const Joi = require('joi');
-const Admin = require('../../models/Admin');
-const AdminId = require('../../models/adminId');
+const User = require('../models/User');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -71,32 +70,19 @@ exports.SignIn = async (req, res) => {
             return res.status(422).send({ error: error.details[0].message })
         }
 
-        const {adminId} = await AdminId.findById({_id : "644bd3faa533572663801676"})
+        
         const salt = await bcrypt.genSalt(10);
         const secured_password = await bcrypt.hash(value.password, salt);
-        await Admin.create({
+        await User.create({
             email : value.email,
-            adminId : adminId,
             password : secured_password
-        }).then(async (admin)=>{
-            if(admin){
-                await AdminId.findByIdAndUpdate({_id : "644bd3faa533572663801676"}, {
-                    $set :{
-                        adminId : adminId + 1
-                    }
-                }).then((d)=>{
-                    return res.status(201).send({
-                        "admin" : admin
-                    })
-                }).catch((error)=>{
-                    return res.status(402).send({
-                        err : "error in updating adminId"
-                    })
-                })
-            }
+        }).then(async (user)=>{
+            return res.status(201).send({
+                "user" : user
+            })
         }).catch(err=>{
             return res.status(402).send({
-                err : "Something went wrong"
+                err : `Something went wrong ${err}`
             })
         })
     } catch (err) {

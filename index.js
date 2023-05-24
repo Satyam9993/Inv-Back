@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
-// const index = require('./routes/index')
+const index = require('./routes/index')
 
 
 // database connection
@@ -30,7 +30,7 @@ app.get("/", (req, res)=>{
 })
 
 // Available Routes
-// app.use('/api', index);
+app.use('/api', index);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
