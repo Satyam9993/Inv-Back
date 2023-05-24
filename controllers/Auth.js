@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Schema for login
 const Loginschema = Joi.object({
-    adminId:  Joi.number().required(),
+    email:  Joi.string().email().required(),
     password: Joi.string().required(),
 });
 exports.Login = async (req, res) => {
@@ -20,19 +20,19 @@ exports.Login = async (req, res) => {
             return res.status(422).send({ error: error.details[0].message })
         }
 
-        await Admin.findOne({ adminId: value.adminId }).then(async (admin) => {
-        await bcrypt.compare(value.password, admin.password).then((bc) => {
+        await User.findOne({ email : value.email }).then(async (user) => {
+        await bcrypt.compare(value.password, user.password).then((bc) => {
             if (bc) {
               const payload = {
-                admin: {
-                  id: admin.id,
+                user: {
+                  id: user.id,
                 },
               };
               const authToken = jwt.sign(payload, JWT_SECRET);
               res.status(200).send({
                         success: "true",
-                        adminauthToken: authToken,
-                        adminId: admin.id,
+                        token: authToken,
+                        userId: user.id,
                     });
             } else {
               res
