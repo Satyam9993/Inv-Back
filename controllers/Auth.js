@@ -4,7 +4,7 @@ const AdminId = require('../../models/adminId');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = process.env.JWT_SECRET_ADMIN;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Schema for login
 const Loginschema = Joi.object({
