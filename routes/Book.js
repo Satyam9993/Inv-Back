@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const {createInv} = require('../controllers/Book');
+const {
+    createInv,
+    fetchInv
+} = require('../controllers/Book');
 const fetchuser = require('../middleware/fetchuser')
 
 router.post('/',fetchuser,createInv);
+router.get('/',fetchuser,fetchInv);
 
 module.exports = router;
