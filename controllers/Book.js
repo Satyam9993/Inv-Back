@@ -80,3 +80,35 @@ exports.deleteInv = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+exports.adjustInv = async (req, res) => {
+    try {
+        const data = {
+            adjuststock : req.body.adjuststock,
+            isAdd : req.body.isAdd,
+            adjustby: req.user.id,
+            remark : req.body.remark
+        };
+        const stock = req.body.isAdd ? (Number(req.body.openstock) + Number(req.body.adjuststock)) : (Number(req.body.openstock) - Number(req.body.adjuststock))
+        await inventory.findByIdAndUpdate({ _id: req.params.invId },{
+            $push:{
+                adjust : data
+            },
+            $set:{
+                openstock : stock
+            }
+        }).then(async (inv) => {
+            await inventory.findById({ _id: inv._id }).then((inventory) => {
+                res.send({ inv: inventory });
+            }).catch((err) => {
+                res.status(502).send({ err });
+            });
+        })
+        .catch(err => {
+            res.status(500).send({ err });
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

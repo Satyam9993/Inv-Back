@@ -5,7 +5,8 @@ const {
     createInv,
     fetchInv,
     updateInv,
-    deleteInv
+    deleteInv,
+    adjustInv
 } = require('../controllers/Book');
 const fetchuser = require('../middleware/fetchuser')
 
@@ -13,5 +14,6 @@ router.post('/',fetchuser,createInv);
 router.get('/',fetchuser,fetchInv);
 router.put('/:invId',fetchuser,updateInv);
 router.delete('/',fetchuser,deleteInv);
+router.put('/adjust/:invId',fetchuser, adjustInv);
 
 module.exports = router;
