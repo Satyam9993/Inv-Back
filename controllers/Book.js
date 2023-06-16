@@ -1,4 +1,5 @@
 const inventory = require('../models/Inventory');
+const pageSize = 1;
 
 exports.createInv = async (req, res) => {
     try {
@@ -17,14 +18,22 @@ exports.createInv = async (req, res) => {
 
 exports.fetchInv = async (req, res) => {
     try {
+
+        const totalRecords = await inventory.countDocuments();
+        const totalPages = Math.ceil(totalRecords / pageSize);
+        const pageNumber = parseInt(req.query.pageNumber) || 1;
+        const skip = (pageNumber - 1) * pageSize;
+        const limit = pageSize;
+
         await inventory.find()
+            .skip(skip)
+            .limit(limit)
             .then((invs) => {
-                res.send({ invs: invs });
+                res.send({ invs: invs, totalPages: totalPages });
             })
             .catch(err => {
                 res.status(500).send({ err });
             })
-
     } catch (error) {
         res.status(501).send({ err: "Server error" });
     }
@@ -84,18 +93,18 @@ exports.deleteInv = async (req, res) => {
 exports.adjustInv = async (req, res) => {
     try {
         const data = {
-            adjuststock : req.body.adjuststock,
-            isAdd : req.body.isAdd,
+            adjuststock: req.body.adjuststock,
+            isAdd: req.body.isAdd,
             adjustby: req.user.id,
-            remark : req.body.remark
+            remark: req.body.remark
         };
         const stock = req.body.isAdd ? (Number(req.body.openstock) + Number(req.body.adjuststock)) : (Number(req.body.openstock) - Number(req.body.adjuststock))
-        await inventory.findByIdAndUpdate({ _id: req.params.invId },{
-            $push:{
-                adjust : data
+        await inventory.findByIdAndUpdate({ _id: req.params.invId }, {
+            $push: {
+                adjust: data
             },
-            $set:{
-                openstock : stock
+            $set: {
+                openstock: stock
             }
         }).then(async (inv) => {
             await inventory.findById({ _id: inv._id }).then((inventory) => {
@@ -104,9 +113,9 @@ exports.adjustInv = async (req, res) => {
                 res.status(502).send({ err });
             });
         })
-        .catch(err => {
-            res.status(500).send({ err });
-        })
+            .catch(err => {
+                res.status(500).send({ err });
+            })
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
