@@ -1,5 +1,5 @@
 const inventory = require('../models/Inventory');
-const pageSize = 1;
+const pageSize = 5;
 
 exports.createInv = async (req, res) => {
     try {
@@ -28,6 +28,7 @@ exports.fetchInv = async (req, res) => {
         await inventory.find()
             .skip(skip)
             .limit(limit)
+            .sort({"_id":-1})
             .then((invs) => {
                 res.send({ invs: invs, totalPages: totalPages });
             })
